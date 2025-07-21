@@ -1,11 +1,9 @@
 import csv
 import json
+import os
 
-def extract(filename=None, separateur=";", demander_suppression_ligne = True):
+def extract(filename=None, separateur=";", demander_suppression_ligne=True):
     data = []
-
-    if filename is None:
-        filename = input("Chemin du fichier CSV : ").lower().strip()
 
     try:
         with open(filename, "r", encoding="utf-8") as fichier:
@@ -24,12 +22,10 @@ def transform(data_to_transform):
     # Pas de modification, on renvoie tel quel
     return data_to_transform
 
-def load(data_to_load):
-
-    nom_sortie = input("Nom du fichier de sortie : ").lower().strip()
-    if not nom_sortie.endswith(".json"):
-        nom_sortie += ".json"
-
+def load(data_to_load, filename):
+    nom_entree, _ = os.path.splitext(filename) #split le str du fichier en nom et .ext, _ remplace la varible extension
+    nom_sortie = nom_entree + ".json"
+    
     with open (nom_sortie, "w", encoding="utf-8") as fichier:
-        json.dump(data_to_load, fichier, indent = 4, ensure_ascii=False)
+        json.dump(data_to_load, fichier, indent=4, ensure_ascii=False)
     return data_to_load
