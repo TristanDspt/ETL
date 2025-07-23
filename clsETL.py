@@ -3,26 +3,15 @@ import json
 import os
 import xml.etree.ElementTree as ET
 
-def extract_manager(filename):
+def extract_manager(filename, demander_suppression_ligne=True):
     filetype = os.path.splitext(filename)[1].lower()
     match filetype:
         case ".csv":
-            return extract_csv(filename)
+            return extract_csv(filename, demander_suppression_ligne=True)
         case ".json":
-            return extract_json(filename)
+            return extract_json(filename, demander_suppression_ligne=True)
         case ".xml":
-            return extract_xml(filename)
-        case _:
-            raise ValueError("Type de fichier non supporté")
-
-def load_manager(data_to_load, filename, filetype):
-    match filetype:
-        case "csv":
-            return load_csv(data_to_load, filename)
-        case "json":
-            return load_json(data_to_load, filename)
-        case "xml":
-            return load_xml(data_to_load, filename)
+            return extract_xml(filename, demander_suppression_ligne=True)
         case _:
             raise ValueError("Type de fichier non supporté")
 
