@@ -15,20 +15,28 @@ def extract_manager(filename):
         case _:
             raise ValueError("Type de fichier non supporté")
 
-def load_manager(filename):
-    # a faire
+def load_manager(data_to_load, filename, filetype):
+    match filetype:
+        case "csv":
+            return load_csv(data_to_load, filename)
+        case "json":
+            return load_json(data_to_load, filename)
+        case "xml":
+            return load_xml(data_to_load, filename)
+        case _:
+            raise ValueError("Type de fichier non supporté")
 
 def extract_csv(filename=None, separateur=";", demander_suppression_ligne=True):
     data = []
     try:
         with open(filename, "r", encoding="utf-8") as fichier:
                 lire_csv = csv.DictReader(fichier, delimiter=separateur)
-                for ligne in lire_csv:
+                for row in lire_csv:
                     if demander_suppression_ligne:
-                        if any(val.strip() for val in ligne.values()):
-                            data.append(ligne)
+                        if any(val.strip() for val in row.values()):
+                            data.append(row)
                     else:
-                        data.append(ligne)
+                        data.append(row)
     except FileNotFoundError:
         print(f"Erreur : fichier {filename} introuvable.")
     return data
@@ -40,12 +48,12 @@ def extract_json(filename=None, demander_suppression_ligne=True):
                 lire_json = json.load(fichier)
                 if not isinstance(lire_json, list):
                     raise ValueError("Le fichier JSON doit contenir une liste de dictionnaires.")
-                for ligne in lire_json:
+                for row in lire_json:
                     if demander_suppression_ligne:
-                        if any(val.strip() for val in ligne.values()):
-                            data.append(ligne)
+                        if any(val.strip() for val in row.values()):
+                            data.append(row)
                     else:
-                        data.append(ligne)
+                        data.append(row)
     except FileNotFoundError:
         print(f"Erreur : fichier {filename} introuvable.")
     return data
@@ -78,8 +86,8 @@ def load_csv(data_to_load, filename):
     with open (nom_sortie, "w", encoding="utf-8", newline="") as fichier:
         writer = csv.DictWriter(fichier, delimiter=",", fieldnames=data_to_load[0].keys())
         writer.writeheader()
-        for ligne in data_to_load:
-            writer.writerow(ligne)
+        for row in data_to_load:
+            writer.writerow(row)
     return data_to_load
 
 def load_xml(data_to_load, filename):
@@ -89,9 +97,9 @@ def load_xml(data_to_load, filename):
         print("Aucune donnée à écrire.")
         return
     root = ET.Element("données")
-    for ligne in data_to_load:
+    for row in data_to_load:
         item = ET.SubElement(root, "ligne")
-        for cle, valeur in ligne.items():
+        for cle, valeur in row.items():
             champ = ET.SubElement(item, cle)
             champ.text = valeur
 
