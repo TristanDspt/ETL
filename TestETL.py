@@ -6,7 +6,8 @@ suppression = demander_suppression_ligne == "o"
 
 donnee_lue = clsETL.extract_manager(filename=chemin, demander_suppression_ligne=suppression)
 
-donnee_transforme = clsETL.transform(donnee_lue)
+colonnes_a_supprimer = ["rowguid", "AdditionalContactInfo", "Demographics"]
+donnee_transforme = clsETL.transform(donnee_lue, remove_col=colonnes_a_supprimer)
 
 print("Choisissez le format d'enregistrement :")
 print("1 - CSV")

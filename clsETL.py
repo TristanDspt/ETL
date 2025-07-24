@@ -52,8 +52,18 @@ def extract_xml(filename=None, separateur=";", demander_suppression_ligne=True):
     # à voir plus tard
     return data
 
-def transform(data_to_transform):
-    # Pas de modification, on renvoie tel quel
+def transform(data_to_transform, remove_col=None):
+    if remove_col is None:
+        remove_col = []
+    for row in data_to_transform:
+        for col in remove_col:
+            row.pop(col, None)
+        if "EmailPromotion" not in row:
+            print("Colone absente")
+        elif row["EmailPromotion"] == "0":
+            row["EmailPromotion"] = "Non" 
+        elif row["EmailPromotion"] == "1" or "2":
+            row["EmailPromotion"] = "Oui"
     return data_to_transform
 
 def load_json(data_to_load, filename):
