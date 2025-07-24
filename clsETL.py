@@ -3,11 +3,11 @@ import json
 import os
 import xml.etree.ElementTree as ET
 
-def extract_manager(filename, demander_suppression_ligne=True):
+def extract_manager(filename, separateur=None, demander_suppression_ligne=True):
     filetype = os.path.splitext(filename)[1].lower()
     match filetype:
         case ".csv":
-            return extract_csv(filename, demander_suppression_ligne=True)
+            return extract_csv(filename, separateur=separateur, demander_suppression_ligne=True)
         case ".json":
             return extract_json(filename, demander_suppression_ligne=True)
         case ".xml":
@@ -17,6 +17,8 @@ def extract_manager(filename, demander_suppression_ligne=True):
 
 def extract_csv(filename=None, separateur=";", demander_suppression_ligne=True):
     data = []
+    if separateur is None:
+        separateur = ";"
     try:
         with open(filename, "r", encoding="utf-8") as fichier:
                 lire_csv = csv.DictReader(fichier, delimiter=separateur)
@@ -30,7 +32,7 @@ def extract_csv(filename=None, separateur=";", demander_suppression_ligne=True):
         print(f"Erreur : fichier {filename} introuvable.")
     return data
 
-def extract_json(filename=None, demander_suppression_ligne=True):
+def extract_json(filename=None, separateur=None, demander_suppression_ligne=True):
     data = []
     try:
         with open(filename, "r", encoding="utf-8") as fichier:
@@ -47,7 +49,7 @@ def extract_json(filename=None, demander_suppression_ligne=True):
         print(f"Erreur : fichier {filename} introuvable.")
     return data
 
-def extract_xml(filename=None, separateur=";", demander_suppression_ligne=True):
+def extract_xml(filename=None, separateur=None, demander_suppression_ligne=True):
     data = []
     # à voir plus tard
     return data
