@@ -9,6 +9,9 @@ if filetype == ".csv":
     if choix_sep in ("", ";"):
         separateur = ";"
     elif choix_sep == "tab":
+        #La gestion du tab est à reporter dans le code de clsETL.py
+        # car c'est une fonctionnalité de l'extract_manager d'autant que si tu te mets à gérer d'autres séparateurs
+        # spéciaux, tu vas devoir modifier le code à chaque fois.
         separateur = "\t"
     elif len(choix_sep) == 1:
         separateur = choix_sep
@@ -26,6 +29,11 @@ colonnes_a_supprimer = ["rowguid", "AdditionalContactInfo", "Demographics"]
 
 donnee_transforme = clsETL.transform(donnee_lue, remove_col=colonnes_a_supprimer)
 
+# d'un point de vue formel, le bloc avant le match est à déplacer dans la section ou tu interroge l'utilisateur
+# pour toutes les données que tu lui demande. 
+# cela devrait d'ailleurs être dans une fonction qui retournerai la liste des valeurs saisies
+# comme cela si un jour on décide de mettre en place une vraie interface graphique,
+# on pourra facilement adapater le code
 print("Choisissez le format d'enregistrement :")
 print("1 - CSV")
 print("2 - JSON")
