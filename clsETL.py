@@ -4,10 +4,14 @@ import os
 import xml.etree.ElementTree as ET
 
 def extract_manager(filename, separateur=None, demander_suppression_ligne=True):
+    # ici la valeur par défaut de separateur est None, ce qui n'est pas logique, une valeur ';' 
+    # est plus logique car c'est le séparateur le plus courant
     filetype = os.path.splitext(filename)[1].lower()
-    # dans le manager le code est faux, tu demande toujours la suppression des lignes!
+    
     match filetype:
         case ".csv":
+            # dans le manager le code est faux, tu demande toujours la suppression des lignes!
+            # c'est le cas de tous les autres appels. Il suffit de passer le paramètre reçu.
             return extract_csv(filename, separateur=separateur, demander_suppression_ligne=True)
         case ".json":
             return extract_json(filename, demander_suppression_ligne=True)
@@ -17,6 +21,10 @@ def extract_manager(filename, separateur=None, demander_suppression_ligne=True):
             raise ValueError("Type de fichier non supporté")
 
 def extract_csv(filename=None, separateur=";", demander_suppression_ligne=True):
+    # la valeur par défaut de filename est None, ce qui n'est pas logique
+    # car tu ne peux pas ouvrir un fichier qui n'existe pas
+    # a ce niveau aucune valeur par défaut n'est logique car tu est sur un appel secondaire du manager
+    # qui gère déjà les valeurs par défaut
     data = []
     # les 2 lignes ci-dessus sont inutiles car le séparateur est déjà géré l'appel
     # par contre tu ne gère pas le cas du tab 
