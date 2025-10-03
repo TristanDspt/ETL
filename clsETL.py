@@ -10,24 +10,28 @@ def extract_manager(filename, separateur=None, demander_suppression_ligne=True):
     Args:
         filename (str): Nom du fichier à lire.
         separateur (str): Caractère séparateur utilisé dans le fichier CSV.
-        demander_suppression_ligne (bool): Supprimer les lignes vides si True..
+        demander_suppression_ligne (bool): Supprimer les lignes vides si True.
         
     Returns:
         Méthode associée.
     """
     filetype = os.path.splitext(filename)[1].lower()
+    try:
+        match filetype:
+            case ".csv":
+                if separateur is None:
+                    separateur = ";"
+                return extract_csv(filename, separateur, demander_suppression_ligne)
+            case ".json":
+                return extract_json(filename, demander_suppression_ligne)
+            case ".xml":
+                return extract_xml(filename, demander_suppression_ligne)
+            case _:
+                raise ValueError("Type de fichier non supporté")
+    except FileNotFoundError:
+        print(f"Erreur : fichier {filename} introuvable.")
+        return None
     
-    match filetype:
-        case ".csv":
-            if separateur is None:
-                separateur = ";"
-            return extract_csv(filename, separateur, demander_suppression_ligne)
-        case ".json":
-            return extract_json(filename, demander_suppression_ligne)
-        case ".xml":
-            return extract_xml(filename, demander_suppression_ligne)
-        case _:
-            raise ValueError("Type de fichier non supporté")
 
 def extract_csv(filename, separateur, demander_suppression_ligne):
     """
@@ -53,6 +57,7 @@ def extract_csv(filename, separateur, demander_suppression_ligne):
                         data.append(row)
     except FileNotFoundError:
         print(f"Erreur : fichier {filename} introuvable.")
+        return None
     return data
 
 def extract_json(filename, demander_suppression_ligne):
@@ -61,7 +66,6 @@ def extract_json(filename, demander_suppression_ligne):
     
     Args:
         filename (str): Nom du fichier à lire.
-        separateur (str): Caractère séparateur utilisé dans le fichier JSON.
         demander_suppression_ligne (bool): Supprimer les lignes vides si True.
 
     Returns:
@@ -75,12 +79,13 @@ def extract_json(filename, demander_suppression_ligne):
                     raise ValueError("Le fichier JSON doit contenir une liste de dictionnaires.")
                 for row in lire_json:
                     if demander_suppression_ligne:
-                        if any(val.strip() for val in row.values()):
+                        if any(str(val).strip() for val in row.values()):
                             data.append(row)
                     else:
                         data.append(row)
     except FileNotFoundError:
         print(f"Erreur : fichier {filename} introuvable.")
+        return None
     return data
 
 def extract_xml(filename, demander_suppression_ligne):
@@ -89,14 +94,32 @@ def extract_xml(filename, demander_suppression_ligne):
     
     Args:
         filename (str): Nom du fichier à lire.
-        separateur (str): Caractère séparateur utilisé dans le fichier XML.
         demander_suppression_ligne (bool): Supprimer les lignes vides si True.
 
     Returns:
         list of dict: Données extraites sous forme de liste de dictionnaires.
     """
     data = []
-    # à voir plus tard
+    try:
+        arbre = ET.parse(filename)
+        root = arbre.getroot()
+
+        for item in root.findall("./ligne"):
+            row = {}
+            for champ in item:
+                row[champ.tag] = champ.text if champ.text is not None else ""
+            if demander_suppression_ligne:
+                if any(str(val).strip() for val in row.values()):
+                    data.append(row)
+            else:
+                data.append(row)
+
+    except FileNotFoundError:
+        print(f"Erreur : fichier {filename} introuvable.")
+        return None
+    except ET.ParseError:
+        print(f"Erreur : le fichier {filename} n'est pas un XML valide.")
+        return None
     return data
 
 def transform(data_to_transform, remove_col=None):
