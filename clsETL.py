@@ -229,12 +229,28 @@ def load_json(data_to_load, filename):
         json.dump(data_to_load, fichier, indent=4, ensure_ascii=False)
     return True
 
+def indent_xml(elem, level=0):
+    """
+    Ajoute des retours à la ligne et des indentations pour un XML lisible.
+    """
+    i = "\n" + level*"  "
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "  "
+        for child in elem:
+            indent_xml(child, level+1)
+        if not child.tail or not child.tail.strip():
+            child.tail = i
+    if level and (not elem.tail or not elem.tail.strip()):
+        elem.tail = i
+        
+
 def load_xml(data_to_load, filename):
     """
-    Ecrit une liste de dictionnaire dans un fichier XML.
+    Ecrit une liste de dictionnaires dans un fichier XML, indenté.
     
     Args:
-        data_to_load (dict): Liste de dictionnaires à ecrire.
+        data_to_load (list of dict): Liste de dictionnaires à écrire.
         filename (str): Nom du fichier.
         
     Returns:
@@ -251,6 +267,8 @@ def load_xml(data_to_load, filename):
         for cle, valeur in row.items():
             champ = ET.SubElement(item, cle)
             champ.text = str(valeur)
+
+    indent_xml(root)  # Ajoute l'indentation
 
     arbre = ET.ElementTree(root)
     arbre.write(nom_sortie, encoding="utf-8", xml_declaration=True)
